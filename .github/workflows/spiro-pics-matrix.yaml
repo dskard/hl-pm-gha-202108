@@ -1,0 +1,59 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+name: spiro-pics-matrix
+
+jobs:
+  spiro-pic:
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: macOS-latest, r: '4.0'}
+          - {os: macOS-latest, r: '3.6'}
+          - {os: macOS-latest, r: '3.5'}
+          - {os: windows-latest, r: '4.0'}
+          - {os: windows-latest, r: '3.6'}
+          - {os: windows-latest, r: '3.5'}
+          - {os: ubuntu-latest, r: '4.0'}
+          - {os: ubuntu-latest, r: '3.6'}
+          - {os: ubuntu-latest, r: '3.5'}
+
+    name: spiro-pic ${{ matrix.config.os }} (${{ matrix.config.r }})
+    runs-on: ${{ matrix.config.os }}
+
+    steps:
+      # check out the repo
+      - uses: actions/checkout@v2
+
+      - name: Install R
+        uses: r-lib/actions/setup-r@v1
+        with:
+          r-version: ${{ matrix.config.r }}
+
+      - name: Install pak
+        shell: Rscript {0}
+        run: |
+          install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
+
+      - name: Install dependencies
+        shell: Rscript {0}
+        run: |
+          pak::pkg_install("ggplot2")
+          pak::pkg_install("tibble")
+
+      - name: Generate spirograph image
+        run: Rscript spirograph.R
+
+      # Upload results
+      - name: Upload results
+        uses: actions/upload-artifact@main
+        with:
+          name: spiro-${{ matrix.config.os }}-r${{ matrix.config.r }}
+          path: spiro.png
