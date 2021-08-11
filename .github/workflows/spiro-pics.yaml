@@ -1,0 +1,42 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+name: spiro-pics
+
+jobs:
+  spiro-pic:
+    name: save a spirograph pic
+    runs-on: ubuntu-latest
+
+    steps:
+      # check out the repo
+      - uses: actions/checkout@v2
+
+      - name: Install R
+        uses: r-lib/actions/setup-r@v1
+
+      - name: Install pak
+        shell: Rscript {0}
+        run: |
+          install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
+
+      - name: Install dependencies
+        shell: Rscript {0}
+        run: |
+          pak::pkg_install("ggplot2")
+          pak::pkg_install("tibble")
+
+      - name: Generate spirograph image
+        run: Rscript spirograph.R
+
+      # Upload results
+      - name: Upload results
+        uses: actions/upload-artifact@main
+        with:
+          name: spiro
+          path: spiro.png
