@@ -10,7 +10,7 @@ on:
       - main
 
 # Give it the action a name
-name: Echo
+name: Echo Across OSs
 
 
 jobs:
@@ -30,6 +30,19 @@ jobs:
   hello-windows:
     # Which operation system does it run on?
     runs-on: windows-latest
+
+    # Define the execution steps...
+    steps:
+      # Step #1
+      # Print "hello world!" from within the bash shell
+      - name: Hello World!
+        shell: bash
+        run: |
+          echo "hello world!"
+
+  hello-ubuntu:
+    # Which operation system does it run on?
+    runs-on: ubuntu-latest
 
     # Define the execution steps...
     steps:
