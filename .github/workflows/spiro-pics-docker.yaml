@@ -1,0 +1,30 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+name: spiro-pics-docker
+
+jobs:
+  spiro-pic-in-docker:
+    name: save a spirograph pic
+    runs-on: ubuntu-latest
+    container: rocker/tidyverse
+
+    steps:
+      # check out the repo
+      - uses: actions/checkout@v2
+
+      # Run our spirograph script to generate a picture
+      - name: Generate spirograph image
+        run: Rscript spirograph.R
+
+      # Upload results
+      - name: Upload results
+        uses: actions/upload-artifact@main
+        with:
+          name: spiro
+          path: spiro.png
